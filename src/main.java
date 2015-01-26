@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -22,10 +23,10 @@ public class main {
 
 	private ExecutorService executor = Executors.newFixedThreadPool(20);
 
-	
 	private List<String> error = new ArrayList<String>();
-	
-	
+	private AtomicInteger progress = new AtomicInteger(0);
+
+	private static int LIMIT = 708; 
 	/**
 	 * main constructor.
 	 * 
@@ -36,8 +37,8 @@ public class main {
 		main hack = new main();
 
 		hack.loadFromURL(
-				"https://cdn10-dooneetv.wisstream.com/series/16b29c5975th480/16b29c5975th480",
-				"1RtzTbghGvkLnJT40w6gzA", "1422124041", 708, "HustleEP2-");
+				"https://cdn10-dooneetv.wisstream.com/series/cab1f6fd73th480/cab1f6fd73th480",
+				"8qvUQWye2Gnui7LF_cZ3Pw", "1422300700", LIMIT, "HustleEP4-");
 
 	}
 
@@ -59,6 +60,8 @@ public class main {
 			}
 
 		}
+		// fetch last one
+		executor.execute(new main.GetTs(requests));
 
 		executor.shutdown();
 		// Wait until all threads are finish
@@ -69,8 +72,8 @@ public class main {
 			e1.printStackTrace();
 		}
 		System.out.println("Finished all threads");
-		for(String file :error){
-			System.out.println("Error File = "+file);
+		for (String file : error) {
+			System.out.println("Error File = " + file);
 		}
 	}
 
@@ -93,6 +96,7 @@ public class main {
 			for (TsRequest request : requests) {
 				try {
 					getTs(request.getUrl(), request.getFileName());
+					System.out.println("Progress "+progress.incrementAndGet()+"/"+LIMIT);
 				} catch (IOException e) {
 					System.out.println("Error  'GET' request to URL : "
 							+ request.getUrl());
@@ -117,15 +121,21 @@ public class main {
 				con.setRequestMethod("GET");
 
 				int responseCode = con.getResponseCode();
-				System.out.println("\nSending 'GET' request to URL : " + url);
-				System.out.println("Response Code : " + responseCode);
+				if (responseCode == 404) {
+					System.out.println("\nNot Found  URL : " + url);
+					System.out.println("Response Code : " + responseCode);
+				} else {
+					System.out.println("\nSending 'GET' request to URL : "
+							+ url);
+					System.out.println("Response Code : " + responseCode);
 
-				System.out.println(test.getAbsolutePath());
-				InputStream input = con.getInputStream();
-				FileOutputStream out = new FileOutputStream(test);
-				IOUtils.copy(input, out);
-				input.close();
-				out.close();
+					System.out.println(test.getAbsolutePath());
+					InputStream input = con.getInputStream();
+					FileOutputStream out = new FileOutputStream(test);
+					IOUtils.copy(input, out);
+					input.close();
+					out.close();
+				}
 			}
 		}
 	}
