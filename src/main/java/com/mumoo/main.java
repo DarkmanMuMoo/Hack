@@ -1,3 +1,5 @@
+package com.mumoo;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,7 +28,8 @@ public class main {
 	private List<String> error = new ArrayList<String>();
 	private AtomicInteger progress = new AtomicInteger(0);
 
-	private static int LIMIT = 708; 
+	private static int LIMIT = 708;
+
 	/**
 	 * main constructor.
 	 * 
@@ -91,12 +94,13 @@ public class main {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
-		@Override
+
 		public void run() {
 			for (TsRequest request : requests) {
 				try {
 					getTs(request.getUrl(), request.getFileName());
-					System.out.println("Progress "+progress.incrementAndGet()+"/"+LIMIT);
+					System.out.println("Progress " + progress.incrementAndGet()
+							+ "/" + LIMIT);
 				} catch (IOException e) {
 					System.out.println("Error  'GET' request to URL : "
 							+ request.getUrl());
